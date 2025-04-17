@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: cd-pipeline-run
+  namespace: sn-labs-danielbarraz
+spec:
+  pipelineRef:
+    name: cd-pipeline
+  workspaces:
+    - name: output
+      persistentVolumeClaim:
+        claimName: oc-lab-pvc
+  params:
+    - name: repo-url
+      value: https://github.com/debarraza915/ci-cd-final-project.git
+    - name: revision
+      value: main
+    - name: app-name
+      value: myapp
+    - name: build-image
+      value: image-registry.openshift-image-registry.svc:5000/sn-labs-danielbarraz/myapp:latest
+    - name: deploy-script
+      value: |
+        oc create deployment myapp --image=image-registry.openshift-image-registry.svc:5000/sn-labs-danielbarraz/myapp:latest --dry-run=client -o yaml | oc apply -f -
